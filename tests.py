@@ -1,11 +1,4 @@
 import pytest
-from main import BooksCollector
-
-
-@pytest.fixture
-def collector():   
-    return BooksCollector()
-
 
 class TestBooksCollector:
     def test_add_new_book_add_two_books(self, collector):
@@ -38,15 +31,15 @@ class TestBooksCollector:
         assert collector.get_book_genre("Безыменный раб") == ""
 
 
-    def test_get_books_for_children(self, collector):
-        collector.add_new_book("Гарри Поттер и философский камень")
-        collector.set_book_genre("Гарри Поттер и философский камень", "Фантастика")
+    def test_get_books_for_children_valid_genre_added(self, collector):
+        collector.add_new_book("Гарри Поттер")
+        collector.set_book_genre("Гарри Поттер", "Фантастика")
+        assert "Гарри Поттер" in collector.get_books_for_children()
+
+    def test_get_books_for_children_adult_genre_not_added(self, collector):
         collector.add_new_book("Оно")
         collector.set_book_genre("Оно", "Ужасы")
-        children_books = collector.get_books_for_children()
-        assert "Гарри Поттер и философский камень" in children_books
-        assert "Оно" not in children_books
-
+        assert "Оно" not in collector.get_books_for_children()
 
     def test_add_book_in_favorites_no_duplicates(self, collector):
         collector.add_new_book("Система становление")
@@ -64,11 +57,14 @@ class TestBooksCollector:
         assert "Система становление" not in favorites
 
 
-    def test_get_books_with_specific_genre(self, collector):
-        collector.add_new_book("Гарри Поттер и философский камень")
-        collector.set_book_genre("Гарри Поттер и философский камень", "Фантастика")
-        collector.add_new_book("Оно")
-        collector.set_book_genre("Оно", "Ужасы")
+    def test_get_books_with_specific_genre_positive(self, collector):
+        collector.add_new_book("Гарри Поттер")
+        collector.set_book_genre("Гарри Поттер", "Фантастика")
         fantasy_books = collector.get_books_with_specific_genre("Фантастика")
-        assert "Гарри Поттер и философский камень" in fantasy_books
+        assert "Гарри Поттер" in fantasy_books
+
+        
+    def test_get_books_with_specific_genre_negative(self, collector):
+        collector.add_new_book("Оно")
+        fantasy_books = collector.get_books_with_specific_genre("Фантастика")
         assert "Оно" not in fantasy_books
